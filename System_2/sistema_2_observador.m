@@ -1,0 +1,34 @@
+sis=zpk([],[0 -1 -2],1)
+
+sis=ss(sis)
+J=[-2+j*sqrt(3) -2-j*sqrt(3) -10];
+
+K=acker(sis.a,sis.b,J)
+A=sis.a;
+C=sis.c;
+B=sis.b;
+
+
+
+%% Cálculo da matriz de ganho do erro do observador
+%Jo=4.*J;
+Jo=[-4 -4 -10];
+phi_coef=poly(Jo) %Obtém os coeficientes do polinômio a partir de suas raízes
+phi=polyval(phi_coef,A) %Avaliar o polinômio para um determinado valor
+phi=phi_coef(1)*A^2+phi_coef(2)*A^1+phi_coef(3)*A+phi_coef(4)*eye(3,3)
+obs=obsv(A,C);
+col=[zeros(length(B)-1,1);1];
+Ke=phi*inv(obs)*col;
+%%
+
+sim('sim_sistema_2_observador')
+figure
+plot(y.time,y.signals.values,'-b','LineWidth',4)
+hold on
+%plot(x2.time,x2.signals.values,'.-r','LineWidth',2)
+plot(Y_obs.time,Y_obs.signals.values,'-g','LineWidth',2);grid;
+plot(r1.time,r1.signals.values,'--k','LineWidth',3)
+h = legend('Y','Y_obs','Ref',1);set(h,'Interpreter','none')
+hold off
+xlabel('Tempo')
+ylabel('estados')

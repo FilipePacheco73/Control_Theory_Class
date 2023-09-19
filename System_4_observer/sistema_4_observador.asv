@@ -1,0 +1,40 @@
+A=[0 1 0 0;20.601 0 0 0;0 0 0 1;-0.4905 0 0 0]
+B=[0 -1 0 0.5]';
+C=[0 0 1 0];
+
+J=[-1+j*sqrt(3) -1-j*sqrt(3) -5 -5 -5]; %polos desejados
+
+Ac=[A zeros(4,1);-C 0]
+Bc=[B;0]
+K=acker(Ac,Bc,J) %Alocação dos polos desejados
+
+%% Cálculo da matriz de ganho do erro do observador
+
+phi=poly(J) %Obtém os coeficientes do polinômio a partir de suas raízes
+phi=polyval(phi,A) %Avaliar o polinômio para um determinado valor
+PJ(1)*A^5+J(2)*A^4+A^3+A^2+A+I*eye(4,4)
+break
+CA=C
+for i=1:length(B)-1
+  CA=[CA;C*A^i];
+end
+
+CA
+break
+col=zeros(length(B),1);
+col(end)=1;
+Ke=phi*inv(CA)*col
+
+
+sim('sim_sistema_4')
+figure
+plot(x1.time,x1.signals.values,'--b','LineWidth',2)
+hold on
+plot(x2.time,x2.signals.values,'.-r','LineWidth',2)
+plot(x3.time,x3.signals.values,'--g','LineWidth',2);grid;
+plot(x6.time,x6.signals.values,'-y','LineWidth',2);
+plot(r1.time,r1.signals.values,'-k','LineWidth',3)
+h = legend('X1','X2','X3','X6','Ref',1);set(h,'Interpreter','none')
+hold off
+xlabel('Tempo')
+ylabel('estados')

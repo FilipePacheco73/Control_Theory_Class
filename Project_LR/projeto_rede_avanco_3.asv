@@ -1,0 +1,41 @@
+%rede em avanço 3 - Questão
+G=zpk([],[0 -3 -8],100)
+%Sistema deve ser duas vezes mais rápido
+qsi=0.42;
+%%
+[num den]=tfdata(minreal(G/(1+G)),'v');
+polos=roots(den)
+alfa=abs(real(polos(2)))
+Tac=4/alfa
+Tacn=Tac/2 
+alfan=4/Tacn
+
+wn=alfan/qsi
+wd=sqrt(wn^2 - alfan^2)
+pd1=-alfan+j*wd
+Gc=zpk([-3],[],1)
+a1=angle(pd1-0)*180/pi
+a2=angle(pd1-(-8))*180/pi
+
+ap=180-(a1+a2)
+ap=ap*pi/180
+
+p=-(wd/tan(ap)+alfan)
+Gc=zpk([-3],[p],1)
+
+%Pela condição de módulo
+d1=abs(pd1-0)
+d2=abs(pd1-(-8))
+d3=abs(pd1-p)
+K=d1*d2*d3
+Kc=K/100
+
+Gc=zpk([-3],[p],Kc)
+sys=G*Gc;
+[num den]=tfdata(minreal(sys/(1+sys)),'v')
+roots(den)
+step(minreal(sys/(1+sys)))
+hold on
+step(minreal(G/(1+G)))
+hold off
+
